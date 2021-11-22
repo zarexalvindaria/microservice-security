@@ -17,12 +17,14 @@ docker build . -t opensuse/leap:latest -m 256mb --no-cache=true
 # Delete docker image
 docker image rm $docker_image -f
 
+# Hardened 2.2
+vim /etc/docker/daemon.json
+-- add "icc": false
+
+# Harded 2.15
+vim /etc/docker/daemon.json
+-- add "live-restore": true
 
 # Hardening 4.5
-
-
-# Hardening 5.10
-docker run --interactive --tty --memory 256m centos /bin/bash
-docker run --interactive --tty --memory 256m opensuse/leap /bin/bash
-
-
+echo $DOCKER_CONTENT_TRUST
+export DOCKER_CONTENT_TRUST=1
