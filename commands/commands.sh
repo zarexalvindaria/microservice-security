@@ -11,6 +11,10 @@ go build -o docker-bench
 ./docker-bench --include-test-output >docker_bench.txt
 cat docker_bench.txt | grep FAIL
 
+# Find Vulnerabilities
+./docker-bench --include-test-output >docker_bench2.txt
+cat docker_bench2.txt | grep FAIL
+
 # Build the docker image
 docker build . -t opensuse/leap:latest -m 256mb --no-cache=true
 
