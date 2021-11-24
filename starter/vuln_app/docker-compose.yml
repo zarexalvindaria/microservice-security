@@ -3,7 +3,7 @@ version: '3.3'
 services:
   postgres:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile.db
     ports:
       - 5432:5432
@@ -13,7 +13,7 @@ services:
 
   sqli:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile.app
     depends_on:
       - postgres
