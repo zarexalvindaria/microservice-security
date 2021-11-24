@@ -25,10 +25,20 @@ docker image rm $docker_image -f
 vim /etc/docker/daemon.json
 -- add "icc": false
 
-# Harded 2.15
+# Hardened 2.15
 vim /etc/docker/daemon.json
 -- add "live-restore": true
 
 # Hardening 4.5
 echo $DOCKER_CONTENT_TRUST
 export DOCKER_CONTENT_TRUST=1
+
+
+------------
+# Hardening a Kubernetes Cluster
+
+# Add ssh key to vagrant box
+cat ~/.ssh/id_rsa.pub | ssh root@192.168.50.10 "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh root@192.168.50.10 "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"
+
+sudo ssh-copy-id -i ~/.ssh/id_rsa root@192.168.50.101
