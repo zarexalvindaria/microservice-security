@@ -52,3 +52,36 @@ kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir
 kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-permissive
 kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-permissive | grep FAIL
 
+# Hardening 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate (Automated)
+-- Changing etcd ownership to etcd
+groupadd --gid 52034 etcd
+useradd --comment "etcd service account" --uid 52034 --gid 52034 etcd
+chown etcd:etcd /var/lib/etcd
+
+-- Configure Kernel Runtime Param
+cd /etc/sysctl.d
+vim 90-kubelet.conf
+
+-- If 90-kubelet.confdoes not exist, then run touch 90-kubelet.conf to create the file.
+-- Set kernel configuration:
+`
+vm.overcommit_memory=1
+vm.panic_on_oom=0
+kernel.panic=10
+kernel.panic_on_oops=1
+kernel.keys.root_maxbytes=25000000
+`
+
+sysctl -p /etc/sysctl.d/90-kubelet.conf
+
+# Verifying etcd ownership
+docker run --pid=host -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+kube-bench run --targets etcd --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+
+# Baseline Hardening Complete
+-- Update cluster.yaml with the configuration in https://rancher.com/docs/rancher/v2.0-v2.4/en/security/rancher-2.4/hardening-2.4/
+rke up
+
+docker run --pid=host -v /etc/passwd:/etc/passwd -v /etc/group:/etc/group -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+kube-bench run --targets etcd --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+
