@@ -30,6 +30,7 @@ def init(argv):
     )
     app['config'] = config
 
+    # Changed autoescape to True to prevent XSS
     setup_jinja(app, loader=PackageLoader('sqli', 'templates'),
                 context_processors=[csrf_processor, auth_user_processor],
                 autoescape=True)
