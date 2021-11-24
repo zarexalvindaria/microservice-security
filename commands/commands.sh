@@ -37,8 +37,18 @@ export DOCKER_CONTENT_TRUST=1
 ------------
 # Hardening a Kubernetes Cluster
 
-# Add ssh key to vagrant box
-cat ~/.ssh/id_rsa.pub | ssh root@192.168.50.10 "cat >> ~/.ssh/authorized_keys"
-cat ~/.ssh/id_rsa.pub | ssh root@192.168.50.10 "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"
+# Add ssh key to vagrant box -- using Git Bash for Windows
+ssh-copy-id -i ~/.ssh/id_rsa root@192.168.50.101
 
-sudo ssh-copy-id -i ~/.ssh/id_rsa root@192.168.50.101
+# Exec Docker container on cluster nodes
+docker run --pid=host -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+
+# Scan using Kubebench
+ -- Hardened Security Scan
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+
+-- Permissive Security Scan
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-permissive
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-permissive | grep FAIL
+
