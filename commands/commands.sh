@@ -1,6 +1,12 @@
 # Install go
+-- Install wget
+zypper install wget
 
+-- Download go repo
+wget http://download.opensuse.org/repositories/devel:/languages:/go/SLE_15_SP3/x86_64/go1.17-1.17.3-5.2.x86_64.rpm
 
+-- Install go
+zypper install go1.17-1.17.3-5.2.x86_64.rpm
 
 # Install docker bench
 git clone https://github.com/aquasecurity/docker-bench
