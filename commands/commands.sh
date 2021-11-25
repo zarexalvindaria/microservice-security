@@ -125,3 +125,14 @@ kubectl --kubeconfig kube_config_cluster.yml edit prometheus prometheus-operator
 
 # Port Forward Grafana
 kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-operator-1637805526-grafana-58dbd6d64d-wffcp 3000
+
+
+# View a sensitive file
+ kubectl exec falco-mr8dk --kubeconfig kube_config_cluster.yml -- ls /etc -la
+ kubectl exec falco-mr8dk --kubeconfig kube_config_cluster.yml cat etc/passwd
+ kubectl --kubeconfig kube_config_cluster.yml cat etc/passwd
+ kubectl --kubeconfig kube_config_cluster.yml exec -it falco-mr8dk /bin/bash
+
+
+ kubectl logs falco-mr8dk --kubeconfig kube_config_cluster.yml | grep sensitive
+
