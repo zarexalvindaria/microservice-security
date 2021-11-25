@@ -45,6 +45,8 @@ export DOCKER_CONTENT_TRUST=1
 
 # Add ssh key to vagrant box -- using Git Bash for Windows
 ssh-copy-id -i ~/.ssh/id_rsa root@192.168.50.101
+ssh-copy-id -i ~/.ssh/id_rsa root@35.189.172.36
+ssh-copy-id -i ~/.ssh/id_rsa root@35.240.209.110
 
 # Exec Docker container on cluster nodes
 docker run --pid=host -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
@@ -106,3 +108,20 @@ curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/inst
 
 -- Install Helm
 helm install --kubeconfig kube_config_cluster.yml falco falcosecurity/falco --set falco.grpc.enabled=true --set falco.grpcOutput.enabled=true
+
+
+------
+
+# Check Prometheus Installation
+kubectl --kubeconfig kube_config_cluster.yml --namespace default get pods -l "release=prometheus-operator-1637805526"
+
+# Port Forward Prometheus
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-prometheus-operator-163780-prometheus-0 9090
+
+# Port Forward Falco Exporter
+kubectl --kubeconfig kube_config_cluster.yml port-forward --namespace default falco-exporter-fbm5r 9376
+
+kubectl --kubeconfig kube_config_cluster.yml edit prometheus prometheus-operator-163780-prometheus
+
+# Port Forward Grafana
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-operator-1637805526-grafana-58dbd6d64d-wffcp 3000
