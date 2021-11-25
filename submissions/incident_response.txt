@@ -1,0 +1,31 @@
+1. Incident commander name:
+   Zarex Alvin Daria
+
+2. Executive Summary of what happened:
+   Three crypto mining pods named moneropool, minergate, and cryptonight were launched by an attacker. This resulted to a
+   huge spike in the CPU usage and crashed some of the pods.
+
+3. Summary of what was affected:
+   The attack affected the Kubernetes cluster. The affected services are the pods hosting Falco, Prometheus, and Grafana.
+
+4. Summary of the impact:
+   The attacker managed to run crypto miners on the system and spiked the CPU usage. This crashed the running pods due 
+   to the system's incapability of handling the CPU spike.
+
+5. Summary of the remediation steps:
+  - I ran the following commands to delete the cryptomining pods:
+    `kubectl --kubeconfig kube_config_cluster.yml delete pod <pod_name> --grace-period=0 --force>`
+
+   I have also deleted all the evicted and crashed pods from all namespaces so that they will be regenerated using the
+   command below:
+    `kubectl --kubeconfig kube_config_cluster.yml delete pod <pod_name> -ns <namespace_name>
+
+   I have ensured that all the services have stabilized, are back to normal, and are now accessible.
+
+6. Summary of lessons learned:
+   - It is good to have a monitoring tool setup like the Grafana dashboards to visualize what is happening in the
+     system. It would be helpful to have alerts from Falco in Grafana for events like these.
+   - In the falco-exporter metrics pane, which is viewable by visiting 127.0.0.1:9376/metrics from a web browser, new pods creation 
+     (i.e. crypto mining pods) will show high priority.
+   - High CPU usage could evict and crash some pods and these pods will not get back to their normal state unless deleted and
+     regenerated.

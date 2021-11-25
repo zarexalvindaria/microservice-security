@@ -1,10 +1,20 @@
 Docker Threat Modeling
 Given Docker's system components and the STRIDE framework, identify five potential threats that may arise.
 
+1. Spoofing — Docker connects virtual interfaces created in bridge mode to a common bridge called docker0. This default networking model is vulnerable to ARP spoofing and MAC flooding attacks as there is no filtering applied to it.
+2. Tampering — The Docker server certificate file should be protected from any tampering. It is used to authenticate the Docker server based on the given server certificate. It must therefore be individually owned and group owned by root to prevent modification by less privileged users.
+3. Information Disclosure — By default, unrestricted network traffic is enabled between all containers on the same host on the default network bridge. Thus, each container has the potential of reading all packets across the container network on the same host. This might lead to an unintended and unwanted disclosure of information to other containers. Hence, restrict inter-container communication on the default network bridge.
+4. Denial of Service — By default a container can use all of the memory on the host. You can use memory limit mechanisms to prevent a denial of service occurring where one container consumes all of the host’s resources and other containers on the same host are therefore not able to function. Having no limit on memory usage can lead to issues where one container can easily make the whole system unstable and as a result unusable.
+5. Elevation of Privilege — Due to traffic network spoofing, an attacker can gain access to the host and other containers. Unnecessary packages should not be installed in the container.
+
 Kubernetes Threat Modeling
 Given Kubernetes' system components and the STRIDE framework, identify five potential threats that may arise.
 
-
+1. Spoofing — Kubernetes ships with insecure defaults, for example, all pods have `CAP_NET_RAW` permissions. This allows all pods to open raw sockets and inject malicious packets into the Kubernetes container network, which may lead to spoofing.
+2. Repudiation — Kubernetes natively doesn't allow certificate revocation, which may lead to repudiation if a certificate cannot be revoked when necessary.
+3. Denial of Service — Kubernetes ships without an upper limit for setting the memory footprint. This may lead to a denial of service which could result in exhausting resources needed to run the pod.
+4. Information Disclosure — Major approaches focuses on being able to read secret data from the cluster directly by exploiting misconfigured RBAC permissions. Other approaches include viewing sensitive data stored within logs and eavesdropping on network traffic.
+5. Elevation of Privilege — Several Kubernetes distributions have made the decision that they don’t consider malicious containers part of their threat model. As such, once an attacker has that level of access then there are minimal controls, by default, stopping them from getting full cluster-admin rights. Ensure that all management ports visible oin the cluster network require authentication for all users.
 
 Docker-bench Run Results and Analysis
 From the failed findings, select and document 3 findings from the Docker-bench results that you want to harden based on the 5 attack surface areas you identified in Step 1. At least 1 of the 3 hardened findings should be different from the ones mentioned in the exercise (i.e. 5.10, 5.14, and 5.22).
